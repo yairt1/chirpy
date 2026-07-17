@@ -2,7 +2,7 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import express from "express";
 import postgres from "postgres";
-import { handlerChirps } from "./api/chirps.js";
+import { handlerCreateChirp, handlerGetChirps } from "./api/chirps.js";
 import { handlerMetrics } from "./api/metrics.js";
 import {
   errorMiddleWare,
@@ -29,6 +29,9 @@ app.get("/api/healthz", (req, res, next) => {
 app.get("/admin/metrics", (req, res, next) => {
   Promise.resolve(handlerMetrics(req, res)).catch(next);
 });
+app.get("/api/chirps", (req, res, next) => {
+  Promise.resolve(handlerGetChirps(req, res)).catch(next);
+})
 app.post("/admin/reset", (req, res, next) => {
   Promise.resolve(handlerReset(req, res)).catch(next);
 });
@@ -36,7 +39,7 @@ app.post("/api/users", (req, res, next) => {
   Promise.resolve(handlerUsersCreate(req, res)).catch(next);
 });
 app.post("/api/chirps", (req, res, next) => {
-  Promise.resolve(handlerChirps(req, res)).catch(next);
+  Promise.resolve(handlerCreateChirp(req, res)).catch(next);
 });
 
 app.use(errorMiddleWare);
