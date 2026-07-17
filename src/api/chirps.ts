@@ -1,25 +1,27 @@
 import { Request, Response } from "express";
 import { respondWithJSON } from "./json.js";
 import { BadRequestError } from "./errors.js";
+import { createChirp } from "../db/queries/chirps.js";
 
-export async function handlerValidation(req: Request, res: Response) {
+export async function handlerChirps(req: Request, res: Response) {
   type RequestData = {
     body: string;
+    userId: string;
   };
 
   const maxBodyLength = 140;
   const profaneWords = ["kerfuffle", "sharbert", "fornax"];
   const hideWords = "****";
 
-  const parsedResponse: RequestData = req.body;
+  const params: RequestData = req.body;
 
-  if (parsedResponse.body.length > maxBodyLength) {
+  if (params.body.length > maxBodyLength) {
     throw new BadRequestError(
       `Chirp is too long. Max length is ${maxBodyLength}`,
     );
   }
 
-  const cleanBody = parsedResponse.body
+  const cleanBody = params.body
     .split(" ")
     .map((value) => {
       if (
@@ -31,5 +33,16 @@ export async function handlerValidation(req: Request, res: Response) {
     })
     .join(" ");
 
-  respondWithJSON(res, 200, { cleanedBody: cleanBody });
+  const chirp = await createChirp({
+    body: cleanBody,
+    userId: params.userId,
+  });
+
+  respondWithJSON(res, 201, {
+    id: chirp.id,
+    createdAt: chirp.createdAt,
+    updatedAt: chirp.updatedAt,
+    body: chirp.body,
+    userId: chirp.userId,
+  });
 }
