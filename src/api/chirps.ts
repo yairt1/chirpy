@@ -3,7 +3,7 @@ import { respondWithJSON } from "./json.js";
 import { BadRequestError } from "./errors.js";
 
 export async function handlerValidation(req: Request, res: Response) {
-  type requestData = {
+  type RequestData = {
     body: string;
   };
 
@@ -11,7 +11,7 @@ export async function handlerValidation(req: Request, res: Response) {
   const profaneWords = ["kerfuffle", "sharbert", "fornax"];
   const hideWords = "****";
 
-  const parsedResponse: requestData = req.body;
+  const parsedResponse: RequestData = req.body;
 
   if (parsedResponse.body.length > maxBodyLength) {
     throw new BadRequestError(
