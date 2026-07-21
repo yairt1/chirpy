@@ -1,4 +1,6 @@
 import { Request, Response } from "express";
+import { getBearerToken, validateJWT } from "../auth.js";
+import { config } from "../config.js";
 import { createChirp, getChirpById, getChirps } from "../db/queries/chirps.js";
 import { BadRequestError, NotFoundError } from "./errors.js";
 import { respondWithJSON } from "./json.js";
@@ -6,7 +8,6 @@ import { respondWithJSON } from "./json.js";
 export async function handlerCreateChirp(req: Request, res: Response) {
   type RequestData = {
     body: string;
-    userId: string;
   };
 
   const maxBodyLength = 140;
@@ -14,6 +15,9 @@ export async function handlerCreateChirp(req: Request, res: Response) {
   const hideWords = "****";
 
   const params: RequestData = req.body;
+
+  const reqAuthToken = getBearerToken(req);
+  const authorizedUserId = validateJWT(reqAuthToken, config.jwt.secret);
 
   if (params.body.length > maxBodyLength) {
     throw new BadRequestError(
@@ -35,7 +39,7 @@ export async function handlerCreateChirp(req: Request, res: Response) {
 
   const chirp = await createChirp({
     body: cleanBody,
-    userId: params.userId,
+    userId: authorizedUserId,
   });
 
   respondWithJSON(res, 201, {
