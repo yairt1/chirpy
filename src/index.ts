@@ -18,7 +18,7 @@ import { handlerReadiness } from "./api/readiness.js";
 import { handlerRefresh } from "./api/refresh.js";
 import { handlerReset } from "./api/reset.js";
 import { handlerRevoke } from "./api/revoke.js";
-import { handlerUsersCreate } from "./api/users.js";
+import { handlerUserUpdate, handlerUsersCreate } from "./api/users.js";
 import { config } from "./config.js";
 
 const migrationClient = postgres(config.db.url, { max: 1 });
@@ -59,6 +59,9 @@ app.post("/api/refresh", (req, res, next) => {
 });
 app.post("/api/revoke", (req, res, next) => {
   Promise.resolve(handlerRevoke(req, res)).catch(next);
+});
+app.put("/api/users", (req, res, next) => {
+  Promise.resolve(handlerUserUpdate(req, res)).catch(next);
 });
 
 app.use(errorMiddleWare);

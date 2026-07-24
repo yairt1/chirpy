@@ -1,4 +1,5 @@
 import { and, eq, gt, isNull } from "drizzle-orm";
+import { BadRequestError } from "../../api/errors.js";
 import { db } from "../index.js";
 import { NewUser, refreshTokens, users } from "../schema.js";
 
@@ -35,4 +36,22 @@ export async function getUserFromRefreshToken(token: string) {
     .limit(1);
 
   return result;
+}
+
+export async function updateEmailAndPassword(
+  id: string,
+  email: string,
+  hashedPassword: string,
+) {
+  const rows = await db
+    .update(users)
+    .set({ email: email, hashedPassword: hashedPassword })
+    .where(and(eq(users.id, id)))
+    .returning();
+
+  if (rows.length === 0) {
+    throw new BadRequestError("Couldn't update email and password");
+  }
+
+  return rows[0];
 }
