@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
-import { checkPasswordHash, makeJWT } from "../auth.js";
+import { checkPasswordHash, makeJWT, makeRefreshToken } from "../auth.js";
 import { config } from "../config.js";
+import { saveRefreshToken } from "../db/queries/refreshTokens.js";
 import { getUserByEmail } from "../db/queries/users.js";
 import { BadRequestError, UnauthorizedError } from "./errors.js";
 import { respondWithJSON } from "./json.js";
@@ -8,13 +9,13 @@ import { UserResponse } from "./users.js";
 
 type LoginResponse = UserResponse & {
   token: string;
+  refreshToken: string;
 };
 
 export async function handlerLoginUser(req: Request, res: Response) {
   type RequestData = {
     password: string;
     email: string;
-    expiresIn?: number;
   };
 
   const params: RequestData = req.body;
@@ -40,12 +41,18 @@ export async function handlerLoginUser(req: Request, res: Response) {
     throw new UnauthorizedError("incorrect email or password");
   }
 
-  let duration = config.jwt.defaultDuration;
-  if (params.expiresIn && params.expiresIn < config.jwt.defaultDuration) {
-    duration = params.expiresIn;
-  }
+  const accessToken = makeJWT(
+    user.id,
+    config.jwt.defaultDuration,
+    config.jwt.secret,
+  );
 
-  const accessToken = makeJWT(user.id, duration, config.jwt.secret);
+  const refreshToken = makeRefreshToken();
+  const savedRefreshToken = await saveRefreshToken(user.id, refreshToken);
+
+  if (!savedRefreshToken) {
+    throw new UnauthorizedError("Could not save refresh token");
+  }
 
   respondWithJSON(res, 200, {
     id: user.id,
@@ -53,5 +60,6 @@ export async function handlerLoginUser(req: Request, res: Response) {
     updatedAt: user.updatedAt,
     email: user.email,
     token: accessToken,
+    refreshToken: refreshToken,
   } satisfies LoginResponse);
 }

@@ -15,6 +15,13 @@
       "when": 1784394037390,
       "tag": "0001_superb_felicia_hardy",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784901266505,
+      "tag": "0002_faithful_killraven",
+      "breakpoints": true
     }
   ]
 }
