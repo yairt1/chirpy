@@ -55,3 +55,13 @@ export async function updateEmailAndPassword(
 
   return rows[0];
 }
+
+export async function updateChirpyRedById(id: string) {
+  const [result] = await db
+    .update(users)
+    .set({ isChirpyRed: true })
+    .where(eq(users.id, id))
+    .returning();
+
+  return result;
+}

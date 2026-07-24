@@ -15,6 +15,7 @@ import {
   middlewareLogResponses,
   middlewareMetricsInc,
 } from "./api/middleware.js";
+import { handlerWebhookChirpyRed } from "./api/webhooks.js";
 import { handlerReadiness } from "./api/readiness.js";
 import { handlerRefresh } from "./api/refresh.js";
 import { handlerReset } from "./api/reset.js";
@@ -60,6 +61,9 @@ app.post("/api/refresh", (req, res, next) => {
 });
 app.post("/api/revoke", (req, res, next) => {
   Promise.resolve(handlerRevoke(req, res)).catch(next);
+});
+app.post("/api/polka/webhooks", (req, res, next) => {
+  Promise.resolve(handlerWebhookChirpyRed(req, res)).catch(next);
 });
 app.put("/api/users", (req, res, next) => {
   Promise.resolve(handlerUserUpdate(req, res)).catch(next);

@@ -3,7 +3,7 @@ import { getBearerToken, hashPassword, validateJWT } from "../auth.js";
 import { config } from "../config.js";
 import { createUser, updateEmailAndPassword } from "../db/queries/users.js";
 import { NewUser } from "../db/schema.js";
-import { BadRequestError, UnauthorizedError } from "./errors.js";
+import { BadRequestError } from "./errors.js";
 import { respondWithJSON } from "./json.js";
 
 export type UserResponse = Omit<NewUser, "hashedPassword">;
@@ -34,6 +34,7 @@ export async function handlerUsersCreate(req: Request, res: Response) {
     email: user.email,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
+    isChirpyRed: user.isChirpyRed,
   } satisfies UserResponse);
 }
 
@@ -63,5 +64,6 @@ export async function handlerUserUpdate(req: Request, res: Response) {
     email: updatedUser.email,
     createdAt: updatedUser.createdAt,
     updatedAt: updatedUser.updatedAt,
+    isChirpyRed: updatedUser.isChirpyRed,
   } satisfies UserResponse);
 }
