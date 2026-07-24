@@ -1,4 +1,5 @@
 import { eq } from "drizzle-orm";
+import { BadRequestError } from "../../api/errors.js";
 import { config } from "../../config.js";
 import { db } from "../index.js";
 import { refreshTokens } from "../schema.js";
@@ -26,6 +27,6 @@ export async function revokeRefreshToken(token: string) {
     .returning();
 
   if (rows.length === 0) {
-    throw new Error("Couldn't revoke token");
+    throw new BadRequestError("Couldn't revoke token");
   }
 }

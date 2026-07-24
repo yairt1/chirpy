@@ -5,6 +5,7 @@ import postgres from "postgres";
 import { handlerLoginUser } from "./api/auth.js";
 import {
   handlerCreateChirp,
+  handlerDeleteChirpById,
   handlerGetChirpById,
   handlerGetChirps,
 } from "./api/chirps.js";
@@ -62,6 +63,9 @@ app.post("/api/revoke", (req, res, next) => {
 });
 app.put("/api/users", (req, res, next) => {
   Promise.resolve(handlerUserUpdate(req, res)).catch(next);
+});
+app.delete("/api/chirps/:chirpId", (req, res, next) => {
+  Promise.resolve(handlerDeleteChirpById(req, res)).catch(next);
 });
 
 app.use(errorMiddleWare);
