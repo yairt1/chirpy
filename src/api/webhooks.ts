@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
+import { getAPIKey } from "../auth.js";
+import { config } from "../config.js";
 import { updateChirpyRedById } from "../db/queries/users.js";
-import { BadRequestError, NotFoundError } from "./errors.js";
+import { BadRequestError, NotFoundError, UnauthorizedError } from "./errors.js";
 
 export async function handlerWebhookChirpyRed(req: Request, res: Response) {
   type RequestData = {
@@ -9,6 +11,12 @@ export async function handlerWebhookChirpyRed(req: Request, res: Response) {
       userId: string;
     };
   };
+
+  const apiKey = getAPIKey(req);
+
+  if (apiKey !== config.api.polkaKey) {
+    throw new UnauthorizedError("Invalid api key");
+  }
 
   const EVENT = "user.upgraded";
 
