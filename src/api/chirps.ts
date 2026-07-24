@@ -58,12 +58,17 @@ export async function handlerCreateChirp(req: Request, res: Response) {
 
 export async function handlerGetChirps(req: Request, res: Response) {
   const authorId = req.query.authorId;
+  const sort = req.query.sort;
 
-  if (typeof authorId !== "string") {
-    throw new BadRequestError("Invalid author id");
+  if (authorId && typeof authorId !== "string") {
+    throw new BadRequestError("Invalid author id query parameter");
   }
 
-  const chirps = await getChirps(authorId);
+  if (sort && typeof sort !== "string") {
+    throw new BadRequestError("Invalid sort query parameter");
+  }
+
+  const chirps = await getChirps(authorId, sort);
 
   respondWithJSON(res, 200, chirps);
 }
